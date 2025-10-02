@@ -17,7 +17,7 @@ load_dotenv()
 groq_api_key = os.getenv("GROQ_API_KEY")
 
 # 🔹 Streamlit app title
-st.title("ChatGroq with Llama3 + HuggingFace Embeddings (PDF QA)")
+st.title("ChatGroq with Llama3 & HuggingFace Embeddings")
 
 # 🔹 Initialize Groq LLM
 llm = ChatGroq(
@@ -75,12 +75,10 @@ def vector_embedding():
         )
         st.session_state.chroma_db.persist()
 
-        st.success("✅ Vector Store saved to FAISS (faiss_index) & Chroma (chroma_db)")
-
-
+        st.success("✅ Vector Store saved to FAISS & ChromaDB")
 
 # 🔹 Button to build vector DB
-if st.button("Build Document Embeddings"):
+if st.button("First Press the button to build Vector DB"):
     vector_embedding()
     st.write("✅ Vector Store DB is ready")
 
