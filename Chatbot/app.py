@@ -8,7 +8,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS, Chroma
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
@@ -37,22 +37,46 @@ prompt = ChatPromptTemplate.from_template(
     """
 )
 
-# 🔹 Function to create vector embeddings
+# 🔹 Function to create vector embeddings & save to FAISS + ChromaDB
 def vector_embedding():
     if "vectors" not in st.session_state:
         # ✅ HuggingFace Embeddings
-        st.session_state.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        st.session_state.embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
 
         # ✅ Load PDFs
         st.session_state.loader = PyPDFDirectoryLoader("./PDF")
         st.session_state.docs = st.session_state.loader.load()
 
         # ✅ Split documents
-        st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-        st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs[:20])  # load first 20 docs
+        st.session_state.text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200
+        )
+        st.session_state.final_documents = st.session_state.text_splitter.split_documents(
+            st.session_state.docs[:20]
+        )  # limit to first 20 docs
 
-        # ✅ Create FAISS vector store
-        st.session_state.vectors = FAISS.from_documents(st.session_state.final_documents, st.session_state.embeddings)
+        # ✅ Create FAISS vector store (in memory)
+        st.session_state.vectors = FAISS.from_documents(
+            st.session_state.final_documents,
+            st.session_state.embeddings
+        )
+
+        # 🔹 Save FAISS to disk (so you can reload later)
+        FAISS.save_local(st.session_state.vectors, "faiss_index")
+
+        # ✅ Create ChromaDB vector store
+        st.session_state.chroma_db = Chroma.from_documents(
+            st.session_state.final_documents,
+            st.session_state.embeddings,
+            persist_directory="./chroma_db"
+        )
+        st.session_state.chroma_db.persist()
+
+        st.success("✅ Vector Store saved to FAISS (faiss_index) & Chroma (chroma_db)")
+
 
 
 # 🔹 Button to build vector DB
