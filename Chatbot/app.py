@@ -107,3 +107,5 @@ if prompt1:
             for i, doc in enumerate(response["context"]):
                 st.write(doc.page_content)
                 st.write("--------------------------------")
+
+# docker run -p 8501:8501 rag-based-chatgroq
