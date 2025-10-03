@@ -1,11 +1,21 @@
 streamlit
 python-dotenv
-langchain
-langchain-groq
+
+# LangChain ecosystem
+LangChain
 langchain-core
 langchain-community
+langchain-groq  
+
+# Vector stores
 faiss-cpu
 chromadb
-huggingface-hub
-transformers
-torch
+
+# Sentence Transformers for Embeddings
+sentence-transformers
+
+# PDF Loader dependency
+pypdf
+
+# Optional utils
+tqdm
