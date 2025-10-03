@@ -1,0 +1,11 @@
+streamlit
+python-dotenv
+langchain
+langchain-groq
+langchain-core
+langchain-community
+faiss-cpu
+chromadb
+huggingface-hub
+transformers
+torch
