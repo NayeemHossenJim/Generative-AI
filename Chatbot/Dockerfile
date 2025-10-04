@@ -18,3 +18,6 @@ EXPOSE 8501
 
 # Run Streamlit app
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+
+#docker pull jimaifsd/rag-based-chatbot:latest
+#docker run -p 8501:8501 jimaifsd/rag-based-chatbot:latest
