@@ -95,8 +95,15 @@ def build():
 def query(q: QueryRequest):
     if STATE['vectors'] is None:
         raise HTTPException(status_code=400, detail='Dear user, no vector database found. Please upload PDFs and build the vector DB first.')
-
     retriever = STATE['vectors'].as_retriever()
+
+    try:
+        pre_docs = retriever.get_relevant_documents(q.question)
+    except Exception:
+        pre_docs = retriever(q.question) if callable(retriever) else []
+
+    if not pre_docs:
+        raise HTTPException(status_code=404, detail='No relevant documents found in the vector database for the given question. Please upload PDFs and rebuild the vector DB, or try a different query.')
     llm = ChatGroq(groq_api_key=GROQ_API_KEY, model_name='llama-3.3-70b-versatile')
     document_chain = create_stuff_documents_chain(llm, PROMPT)
     retrieval_chain = create_retrieval_chain(retriever, document_chain)
