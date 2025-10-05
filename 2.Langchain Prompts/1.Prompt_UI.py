@@ -1,12 +1,14 @@
-from langchain_openai import ChatOpenAI
+import os
+from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 import streamlit as st
 from langchain_core.prompts import PromptTemplate,load_prompt
 
 load_dotenv()
-model = ChatOpenAI()
+groq_api_key = os.getenv("GROQ_API_KEY")
+model = ChatGroq(groq_api_key=groq_api_key, model="llama-3.3-70b-versatile")
 
-st.header('Reasearch Tool')
+st.header('Research Tool')
 
 paper_input = st.selectbox( "Select Research Paper Name", ["Attention Is All You Need", "BERT: Pre-training of Deep Bidirectional Transformers", "GPT-3: Language Models are Few-Shot Learners", "Diffusion Models Beat GANs on Image Synthesis"] )
 

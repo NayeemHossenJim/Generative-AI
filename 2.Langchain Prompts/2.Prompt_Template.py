@@ -13,7 +13,7 @@ template2 = PromptTemplate(
 )
 
 # fill the values of the placeholders
-prompt = template2.invoke({'name':'nitish'})
+prompt = template2.invoke({'name':'Jim'})
 
 result = model.invoke(prompt)
 
