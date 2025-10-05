@@ -27,7 +27,6 @@ GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 app = FastAPI(title='PDF Chatbot API')
 app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
 
-
 # In-memory store for uploaded files and vectors
 STATE = {
     'upload_dir': None,
@@ -68,7 +67,7 @@ async def upload(file: UploadFile = File(...)):
 @app.post('/build')
 def build():
     if not STATE['pdf_paths']:
-        raise HTTPException(status_code=400, detail='No PDF files uploaded')
+        raise HTTPException(status_code=400, detail='No PDF files uploaded. Please upload PDFs first.')
 
     # Load and split documents
     docs = []
@@ -89,13 +88,13 @@ def build():
     chroma_db.persist()
 
     STATE['vectors'] = vectors
-    return {'ok': True, 'message': 'Vector DB created'}
+    return {'ok': True, 'message': 'Congratulations! Vector database built successfully.'}
 
 
 @app.post('/query')
 def query(q: QueryRequest):
     if STATE['vectors'] is None:
-        raise HTTPException(status_code=400, detail='Vector DB not built')
+        raise HTTPException(status_code=400, detail='Dear user, no vector database found. Please upload PDFs and build the vector DB first.')
 
     retriever = STATE['vectors'].as_retriever()
     llm = ChatGroq(groq_api_key=GROQ_API_KEY, model_name='llama-3.3-70b-versatile')
