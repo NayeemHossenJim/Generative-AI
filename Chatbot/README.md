@@ -57,7 +57,9 @@ Then open your browser and navigate to [http://localhost:8501](http://localhost:
 2. **Create a virtual environment**
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   # On Windows PowerShell:
+   venv\Scripts\Activate.ps1
+   # On cmd.exe: venv\Scripts\activate.bat
    ```
 
 3. **Install dependencies**
@@ -67,14 +69,17 @@ Then open your browser and navigate to [http://localhost:8501](http://localhost:
 
 4. **Set up environment variables**
    ```bash
-   # Create a .env file
+   # Create a .env file and add your GROQ_API_KEY
    echo GROQ_API_KEY=your_api_key_here > .env
    ```
 
-5. **Run the application**
-   ```bash
-   streamlit run app.py
+5. **Run the FastAPI server**
+   ```powershell
+   uvicorn api:app --reload --port 8000
    ```
+
+6. **Open the frontend**
+   - Serve the static files in `frontend/` (open `frontend/index.html` in your browser or use a static server) and point the API endpoint field to `http://localhost:8000`.
 
 ## 🐳 Docker Development
 

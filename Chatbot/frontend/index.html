@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PDF Chatbot</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="chat-app">
+    <header class="chat-header">
+      <div class="left">
+        <img src="https://img.icons8.com/clouds/48/pdf.png" alt="pdf"/>
+        <div>
+          <h1>PDF Chatbot</h1>
+          <div class="muted small">Ask your PDFs anything</div>
+        </div>
+      </div>
+
+      <div class="right">
+        <label class="filebtn small">
+          <input id="file-input" type="file" accept="application/pdf" multiple />
+          <span>📎 Upload</span>
+        </label>
+        <input id="api-url" class="api" placeholder="http://localhost:8000" value="http://localhost:8000" />
+        <button id="build-btn" class="primary" disabled>🚀 Build</button>
+      </div>
+    </header>
+
+    <main class="chat-main">
+      <div class="sidebar-panel">
+        <div class="panel-section">
+          <h3>Files</h3>
+          <div class="uploads" id="uploads">
+            <p class="muted">No files selected</p>
+          </div>
+          <h3 style="margin-top:12px">Instructions</h3>
+          <div class="muted">Upload PDFs, build the vector DB, then ask questions. Use the API endpoint input to connect to your wrapper.</div>
+        </div>
+      </div>
+
+      <section class="chat-area">
+        <ul class="messages" id="responses">
+          <li class="system muted">Welcome — upload your PDFs and build the vector DB, or try the demo button.</li>
+        </ul>
+
+        <div class="composer">
+          <textarea id="question" placeholder="Type a message..."></textarea>
+          <div class="composer-actions">
+            <button id="ask-btn" class="primary" disabled>Send</button>
+            <button id="clear-btn" class="ghost">Clear</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

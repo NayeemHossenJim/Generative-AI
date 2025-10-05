@@ -1,11 +1,13 @@
-streamlit
 python-dotenv
+fastapi
+uvicorn[standard]
+python-multipart
 
 # LangChain ecosystem
 LangChain
 langchain-core
 langchain-community
-langchain-groq  
+langchain-groq
 
 # Vector stores
 faiss-cpu
