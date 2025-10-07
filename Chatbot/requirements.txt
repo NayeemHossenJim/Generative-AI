@@ -8,6 +8,7 @@ LangChain
 langchain-core
 langchain-community
 langchain-groq
+langchain-experimental
 
 # Vector stores
 faiss-cpu
