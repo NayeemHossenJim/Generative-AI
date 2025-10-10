@@ -11,6 +11,7 @@ langchain-groq
 langchain-google-genai
 langchain-huggingface
 openai
+ddgs
 
 # Vector Stores and Embeddings
 chromadb
