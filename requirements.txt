@@ -1,29 +1,45 @@
-# LangChain Core
+# Core LangChain packages
 langchain
 langchain-core
+langchain-community
+langchain-experimental
 
-# OpenAI Integration
+# Model Integrations
 langchain-openai
+langchain-anthropic
+langchain-groq
+langchain-google-genai
+langchain-huggingface
 openai
 
-# Anthropic Integration
-langchain-anthropic
-langchain-experimental
-youtube_transcript_api
+# Vector Stores and Embeddings
+chromadb
+faiss-cpu
+sentence-transformers
 
-# Google Gemini (PaLM) Integration
-langchain-google-genai
-google-generativeai
-wikipedia
-# Hugging Face Integration
-langchain-huggingface
-transformers
-huggingface-hub
+# Document Processing
+pypdf
+youtube-transcript-api
 
-# Environment Variable Management
-python-dotenv
-
-# Machine Learning Utilities
+# ML and Data Science
 numpy
 scikit-learn
+transformers
+huggingface-hub
+google-generativeai
+
+# API Development
+fastapi
+uvicorn[standard]
+python-multipart
+streamlit
+wikipedia
+
+# Utils and Environment
+python-dotenv
+tqdm
 grandalf
+
+# Optional Jupyter Support
+jupyter
+ipywidgets
