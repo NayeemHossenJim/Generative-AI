@@ -9,6 +9,7 @@ openai
 # Anthropic Integration
 langchain-anthropic
 langchain-experimental
+youtube_transcript_api
 
 # Google Gemini (PaLM) Integration
 langchain-google-genai
