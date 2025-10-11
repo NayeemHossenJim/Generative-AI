@@ -197,5 +197,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 [![GitHub stars](https://img.shields.io/github/stars/NayeemHossenJim/Generative-AI.svg?style=social&label=Star)](https://github.com/NayeemHossenJim/Generative-AI)
 
 </div>
-
-Happy Building! 🚀
