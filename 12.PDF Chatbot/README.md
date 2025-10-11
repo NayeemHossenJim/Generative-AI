@@ -73,13 +73,13 @@ Then open your browser and navigate to [http://localhost:8501](http://localhost:
    echo GROQ_API_KEY=your_api_key_here > .env
    ```
 
-5. **Run the FastAPI server**
+5. **Run the FastAPI server with built-in UI**
    ```powershell
-   uvicorn api:app --reload --port 8000
+   python -m uvicorn FastAPI:app --app-dir "12.PDF Chatbot" --reload --port 8000
    ```
 
-6. **Open the frontend**
-   - Serve the static files in `frontend/` (open `frontend/index.html` in your browser or use a static server) and point the API endpoint field to `http://localhost:8000`.
+6. **Open the app**
+   - Go to http://127.0.0.1:8000/ to use the Messenger/WhatsApp-style web UI served by FastAPI.
 
 ## 🐳 Docker Development
 

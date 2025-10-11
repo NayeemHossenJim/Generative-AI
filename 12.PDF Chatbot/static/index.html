@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PDF Chatbot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><text y='0.9em' font-size='200'>📄</text></svg>">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">📄</div>
+        <div class="title">PDF Chatbot</div>
+      </div>
+      <div class="uploader">
+        <label class="file-label">
+          <input id="file-input" type="file" accept="application/pdf" multiple />
+          <span>Upload PDFs</span>
+        </label>
+        <button id="build-btn" class="btn primary" disabled>Build Knowledge</button>
+        <div id="status" class="status">No files uploaded</div>
+      </div>
+      <div class="help">
+        <p>Steps:</p>
+        <ol>
+          <li>Select one or more PDF files</li>
+          <li>Click "Build Knowledge"</li>
+          <li>Start chatting on the right</li>
+        </ol>
+      </div>
+    </aside>
+
+    <main class="chat">
+      <header class="chat-header">
+        <div class="chat-title">
+          <div class="avatar">🤖</div>
+          <div>
+            <div class="name">Assistant</div>
+            <div class="sub">Ask anything from your PDFs</div>
+          </div>
+        </div>
+        <button id="health-btn" class="btn ghost">Health</button>
+      </header>
+
+      <section id="messages" class="messages"></section>
+
+      <form id="composer" class="composer">
+        <input id="question" type="text" placeholder="Type a message" autocomplete="off" />
+        <button class="send" aria-label="Send">➤</button>
+      </form>
+    </main>
+  </div>
+
+  <template id="bubble-user">
+    <div class="bubble user">
+      <div class="text"></div>
+      <div class="meta"><span class="time"></span></div>
+    </div>
+  </template>
+
+  <template id="bubble-bot">
+    <div class="bubble bot">
+      <div class="text"></div>
+      <div class="meta"><span class="time"></span></div>
+    </div>
+  </template>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

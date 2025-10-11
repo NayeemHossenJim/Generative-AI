@@ -1,0 +1,95 @@
+/* Reset */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: #0b141a; /* WhatsApp dark bg */
+  color: #e9edef;
+  font-size: 14px; /* compact base size */
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 260px 1fr; /* narrower sidebar */
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  background: #111b21;
+  border-right: 1px solid #233138;
+  padding: 12px; /* tighter */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo { font-size: 22px; }
+.title { font-weight: 700; letter-spacing: .2px; font-size: 14px; }
+
+.uploader { display: flex; flex-direction: column; gap: 8px; }
+.file-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px dashed #2a3942;
+  border-radius: 8px;
+  color: #aebac1;
+  cursor: pointer;
+}
+.file-label input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+.btn { height: 36px; border: 1px solid #2a3942; border-radius: 8px; background: transparent; color: #aebac1; cursor: pointer; font-size: 13px; }
+.btn:hover { background: #1f2c33; color: #e9edef; }
+.btn.primary { border-color: #00a884; color: white; background: #00a884; }
+.btn.primary:disabled { opacity: .6; cursor: not-allowed; }
+.btn.ghost { background: transparent; }
+.status { color: #8696a0; font-size: 12px; }
+
+.help { margin-top: auto; color: #8696a0; font-size: 13px; }
+.help ol { margin: 8px 0 0; padding-left: 18px; }
+
+/* Chat */
+.chat { display: grid; grid-template-rows: 48px 1fr 56px; height: 100vh; }
+.chat-header { display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-bottom: 1px solid #233138; background: #202c33; }
+.chat-title { display: flex; align-items: center; gap: 12px; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: #0b8466; display: grid; place-items: center; font-size: 14px; }
+.name { font-weight: 600; font-size: 14px; }
+.sub { color: #8696a0; font-size: 11px; }
+
+.messages {
+  position: relative;
+  padding: 12px;
+  overflow-y: auto;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><defs><pattern id="p" width="48" height="48" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="%23233138"/></pattern></defs><rect width="600" height="600" fill="%230b141a"/><rect width="600" height="600" fill="url(%23p)"/></svg>');
+}
+
+.bubble {
+  max-width: min(70%, 640px);
+  margin: 3px 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  position: relative;
+  line-height: 1.35;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  font-size: 0.95em;
+}
+.bubble .meta { text-align: right; margin-top: 2px; font-size: 11px; color: #8696a0; }
+
+.bubble.user { margin-left: auto; background: #005c4b; }
+.bubble.bot { margin-right: auto; background: #202c33; }
+
+.composer { display: grid; grid-template-columns: 1fr 44px; gap: 8px; padding: 8px 12px; border-top: 1px solid #233138; background: #202c33; }
+.composer input {
+  width: 100%; height: 40px; border-radius: 20px; padding: 0 14px; border: 1px solid #2a3942; background: #111b21; color: #e9edef; font-size: 14px;
+}
+.send { width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer; background: #00a884; color: #fff; font-size: 16px; }
+.send:hover { filter: brightness(1.05); }
+
+/* Utilities */
+.hidden { display: none !important; }
