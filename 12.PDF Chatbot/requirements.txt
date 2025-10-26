@@ -1,24 +1,25 @@
-python-dotenv
-fastapi
-uvicorn[standard]
-python-multipart
+# Web/API
+fastapi>=0.95.0
+uvicorn[standard]>=0.20.0
+python-dotenv>=1.0.0
+python-multipart>=0.0.6
 
-# LangChain ecosystem
-LangChain
-langchain-core
-langchain-community
-langchain-groq
-langchain-experimental
+# LangChain ecosystem (core + community + groq connector)
+langchain>=0.0.300
+langchain-core>=0.0.5
+langchain-community>=0.0.22
+langchain-groq>=0.0.6
 
-# Vector stores
-faiss-cpu
-chromadb
+# Vector stores & embeddings
+faiss-cpu>=1.7.4
+chromadb>=0.3.22
+sentence-transformers>=2.2.2
+transformers>=4.33.0
+huggingface-hub>=0.14.0
 
-# Sentence Transformers for Embeddings
-sentence-transformers
+# PDF loader
+pypdf>=3.10.1
 
-# PDF Loader dependency
-pypdf
-
-# Optional utils
-tqdm
+# Utilities
+requests>=2.31.0
+tqdm>=4.65.0
