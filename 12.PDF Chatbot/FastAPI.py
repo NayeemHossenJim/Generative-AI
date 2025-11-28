@@ -33,7 +33,10 @@ def index():
         raise HTTPException(status_code=404, detail='UI not found. Ensure static assets are present.')
     return FileResponse(index_path)
 
-# In-memory store for uploaded files and vectors
+
+# -------------------------------------------------------------------------
+# STATE
+# -------------------------------------------------------------------------
 STATE = {
     'upload_dir': None,
     'pdf_paths': [],
@@ -45,19 +48,28 @@ class QueryRequest(BaseModel):
     question: str
 
 
-# Prompt template string (we'll instantiate the chat prompt lazily)
-PROMPT_TMPL = (
-    """
-Answer the questions based on the provided context only.
-Please provide the most accurate response based on the question.
+# -------------------------------------------------------------------------
+# Modern Prompt Template (compatible with Runnable workflow)
+# -------------------------------------------------------------------------
+PROMPT_TMPL = """
+You are Jim, a knowledgeable and professional assistant. Your role is to provide clear, concise, and accurate answers. Respond in a helpful, professional tone, staying in character as Jim.
+
+Use ONLY the information provided in the <context> section. Do NOT provide any information outside of it.
+
 <context>
 {context}
-<context>
+</context>
+
 Question: {input}
+
+Answer as Jim. Occasionally, sign your answers with “—Jim” for emphasis, but it’s not required on every response.
 """
-)
 
 
+
+# -------------------------------------------------------------------------
+# UPLOAD PDF
+# -------------------------------------------------------------------------
 @app.post('/upload')
 async def upload(file: UploadFile = File(...)):
     if file.content_type != 'application/pdf':
@@ -69,99 +81,134 @@ async def upload(file: UploadFile = File(...)):
     path = os.path.join(STATE['upload_dir'], file.filename)
     with open(path, 'wb') as f:
         shutil.copyfileobj(file.file, f)
+
     STATE['pdf_paths'].append(path)
     return {'ok': True, 'path': path}
 
 
+# -------------------------------------------------------------------------
+# BUILD VECTOR DB
+# -------------------------------------------------------------------------
 @app.post('/build')
 def build():
     if not STATE['pdf_paths']:
         raise HTTPException(status_code=400, detail='No PDF files uploaded. Please upload PDFs first.')
 
-    # Lazy imports to avoid heavy deps at import time
     try:
         from langchain_community.document_loaders import PyPDFLoader
-        from langchain.text_splitter import RecursiveCharacterTextSplitter
-        from langchain_community.embeddings import HuggingFaceEmbeddings
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
+        from langchain_huggingface import HuggingFaceEmbeddings
         from langchain_community.vectorstores import FAISS, Chroma
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Missing or incompatible dependencies for build: {e}")
+        raise HTTPException(status_code=500, detail=f"Missing or incompatible dependencies: {e}")
 
-    # Load and split documents
+    # Load all PDF pages
     docs = []
     for path in STATE['pdf_paths']:
         loader = PyPDFLoader(path)
-        docs.extend(loader.load())
+        loaded = loader.load()
+        # filter out empty pages
+        loaded = [d for d in loaded if d.page_content.strip()]
+        docs.extend(loaded)
 
+    if not docs:
+        raise HTTPException(status_code=400, detail="All PDF pages were empty. Cannot build vectors.")
+
+    # Chunking
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    final_documents = splitter.split_documents(docs)
+    chunks = splitter.split_documents(docs)
 
-    embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
-    vectors = FAISS.from_documents(final_documents, embeddings)
+    # Remove empty chunks
+    chunks = [c for c in chunks if c.page_content.strip()]
+    if not chunks:
+        raise HTTPException(status_code=400, detail="All PDF chunks were empty after splitting.")
 
-    # Save local
+    # Correct modern embeddings import
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+    # Build FAISS safely
+    vectors = FAISS.from_documents(chunks, embeddings)
+
+    # Persist indexes
     FAISS.save_local(vectors, os.path.join(BASE_DIR, 'faiss_index'))
 
-    chroma_db = Chroma.from_documents(final_documents, embeddings, persist_directory=os.path.join(BASE_DIR, 'chroma_db'))
-    chroma_db.persist()
+    chroma = Chroma.from_documents(
+        chunks, embeddings,
+        persist_directory=os.path.join(BASE_DIR, 'chroma_db')
+    )
+    chroma.persist()
 
     STATE['vectors'] = vectors
-    return {'ok': True, 'message': 'Congratulations! Vector database built successfully.'}
+    return {'ok': True, 'message': 'Vector DB built successfully with modern LangChain.'}
 
-
+# -------------------------------------------------------------------------
+# QUERY (Modern LangChain Runnables RAG)
+# -------------------------------------------------------------------------
 @app.post('/query')
 def query(q: QueryRequest):
     if STATE['vectors'] is None:
-        raise HTTPException(status_code=400, detail='Dear user, no vector database found. Please upload PDFs and build the vector DB first.')
+        raise HTTPException(status_code=400, detail='No vector database found. Please upload PDFs and build first.')
+
     if not GROQ_API_KEY:
-        raise HTTPException(status_code=500, detail='GROQ_API_KEY is not set. Please add it to a .env file or environment variables.')
-    # Lazy imports
+        raise HTTPException(status_code=500, detail='GROQ_API_KEY is not set.')
+
     try:
         from langchain_groq import ChatGroq
-        from langchain.chains.combine_documents import create_stuff_documents_chain
         from langchain_core.prompts import ChatPromptTemplate
-        from langchain.chains import create_retrieval_chain
+        from langchain_core.runnables import RunnablePassthrough, RunnableParallel
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Missing or incompatible dependencies for query: {e}")
+        raise HTTPException(status_code=500, detail=f"Missing or incompatible dependencies: {e}")
 
     retriever = STATE['vectors'].as_retriever()
 
-    try:
-        pre_docs = retriever.get_relevant_documents(q.question)
-    except Exception:
-        pre_docs = retriever(q.question) if callable(retriever) else []
+    # LLM
+    llm = ChatGroq(
+        groq_api_key=GROQ_API_KEY,
+        model_name='llama-3.3-70b-versatile'
+    )
 
-    if not pre_docs:
-        raise HTTPException(status_code=404, detail='No relevant documents found in the vector database for the given question. Please upload PDFs and rebuild the vector DB, or try a different query.')
-    llm = ChatGroq(groq_api_key=GROQ_API_KEY, model_name='llama-3.3-70b-versatile')
+    # Prompt
     prompt = ChatPromptTemplate.from_template(PROMPT_TMPL)
-    document_chain = create_stuff_documents_chain(llm, prompt)
-    retrieval_chain = create_retrieval_chain(retriever, document_chain)
 
-    start = time.process_time()
-    resp = retrieval_chain.invoke({'input': q.question})
-    end = time.process_time()
+    # New Runnable RAG pipeline
+    rag_chain = (
+        {
+            "context": retriever,
+            "input": RunnablePassthrough(),
+        }
+        | prompt
+        | llm
+    )
 
-    # Serialize context documents (avoid JSON serialization errors)
-    ctx = resp.get('context', [])
-    try:
-        serialized_ctx = [
-            {
-                'page_content': getattr(d, 'page_content', str(d)),
-                'metadata': getattr(d, 'metadata', {}),
-            }
-            for d in (ctx or [])
-        ]
-    except Exception:
-        serialized_ctx = []
+    # Also return retrieved docs (optional)
+    rag_with_docs = RunnableParallel(
+        answer=rag_chain,
+        docs=retriever
+    )
+
+    start = time.time()
+    result = rag_with_docs.invoke(q.question)
+    end = time.time()
+
+    # Serialize context safely
+    serialized_docs = [
+        {
+            "page_content": getattr(d, "page_content", ""),
+            "metadata": getattr(d, "metadata", {}),
+        }
+        for d in result["docs"]
+    ]
 
     return {
-        'answer': resp.get('answer'),
-        'context': serialized_ctx,
-        'time': round(end - start, 2),
+        "answer": result["answer"].content,
+        "context": serialized_docs,
+        "time": round(end - start, 2),
     }
 
 
+# -------------------------------------------------------------------------
+# HEALTH
+# -------------------------------------------------------------------------
 @app.get('/health')
 def health():
     return {'status': 'ok', 'uploaded_files': len(STATE['pdf_paths'])}
