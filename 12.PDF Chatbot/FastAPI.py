@@ -62,7 +62,7 @@ Use ONLY the information provided in the <context> section. Do NOT provide any i
 
 Question: {input}
 
-Answer as Jim. Occasionally, sign your answers with “—Jim” for emphasis, but it’s not required on every response.
+Answer as Jim sometimes. Occasionally, sign your answers with “—Jim” very little time for emphasis, but it’s not required on every response.
 """
 
 
