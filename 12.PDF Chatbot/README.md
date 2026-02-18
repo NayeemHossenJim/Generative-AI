@@ -22,9 +22,9 @@ A powerful and intelligent chatbot that can understand and answer questions abou
 ## 🛠️ Technology Stack
 
 - **Frontend**: Streamlit
-- **Language Model**: Llama 3.3 70B (via Groq)
-- **Embeddings**: HuggingFace (sentence-transformers)
-- **Vector Stores**: 
+- **Language Model**: OpenAI (via `langchain-openai`)
+- **Embeddings**: OpenAI Embeddings (via `langchain-openai`)
+- **Vector Stores**:
   - FAISS (Facebook AI Similarity Search)
   - ChromaDB
 - **Document Processing**: LangChain
@@ -49,12 +49,14 @@ Then open your browser and navigate to [http://localhost:8501](http://localhost:
 ## 🛠️ Local Development Setup
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd Chatbot
    ```
 
 2. **Create a virtual environment**
+
    ```bash
    python -m venv venv
    # On Windows PowerShell:
@@ -63,23 +65,26 @@ Then open your browser and navigate to [http://localhost:8501](http://localhost:
    ```
 
 3. **Install dependencies**
+
    ```bash
    pip install -r requirements.txt
    ```
 
 4. **Set up environment variables**
+
    ```bash
-   # Create a .env file and add your GROQ_API_KEY
-   echo GROQ_API_KEY=your_api_key_here > .env
+   # Create a .env file and add your OPENAI_API_KEY
+   echo OPENAI_API_KEY=your_api_key_here > .env
    ```
 
 5. **Run the FastAPI server with built-in UI**
+
    ```powershell
    python -m uvicorn FastAPI:app --app-dir "12.PDF Chatbot" --reload --port 8000
    ```
 
 6. **Open the app**
-   - Go to http://127.0.0.1:8000/ to use the Messenger/WhatsApp-style web UI served by FastAPI.
+   - Go to <http://127.0.0.1:8000/> to use the Messenger/WhatsApp-style web UI served by FastAPI.
 
 ## 🐳 Docker Development
 
@@ -124,7 +129,7 @@ The application can be configured through environment variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| GROQ_API_KEY | API key for Groq | Required |
+| OPENAI_API_KEY | API key for OpenAI | Required |
 | CHUNK_SIZE | Document chunk size | 1000 |
 | CHUNK_OVERLAP | Chunk overlap size | 200 |
 
